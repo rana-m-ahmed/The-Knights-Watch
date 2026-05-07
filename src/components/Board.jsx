@@ -1,29 +1,7 @@
 import { Tile } from './Tile.jsx';
+import { ParticleBackground } from './ParticleBackground.jsx';
+import { TorchCorners } from './TorchCorners.jsx';
 import { getValidMoves, getWarnsdorffScore } from '../engine/knightLogic.js';
-
-const styles = {
-  board: {
-    display: 'grid',
-    gap: '2px',
-    padding: '16px',
-    background: '#0a0c12',
-    borderRadius: '4px',
-    boxShadow: 'inset 0 0 30px rgba(0,0,0,0.5)',
-    aspectRatio: '1',
-    maxWidth: '600px',
-    margin: '0 auto'
-  },
-  boardNormal: {
-    boxShadow: '0 0 0 2px rgba(180,150,80,0.3), inset 0 0 30px rgba(0,0,0,0.5)'
-  },
-  boardWarning: {
-    boxShadow: '0 0 0 3px rgba(180,60,40,0.6), 0 0 20px rgba(180,60,40,0.2), inset 0 0 30px rgba(0,0,0,0.5)',
-    animation: 'timerWarn 1s ease-in-out infinite'
-  },
-  boardShake: {
-    animation: 'boardShake 0.3s ease-in-out'
-  }
-};
 
 export function Board({
   grid,
@@ -35,34 +13,69 @@ export function Board({
   jumpAnim,
   hintMode,
   timeRatio,
-  onMove
+  onMove,
+  trail,
+  safeRuneSequence,
+  runeProgress,
+  cipherFailed,
+  visibleCells,
+  fogOfWar,
+  levelIdx,
 }) {
+  const tierClass = levelIdx < 4
+    ? 'theme-tier-1'
+    : levelIdx < 8
+    ? 'theme-tier-2'
+    : levelIdx < 12
+    ? 'theme-tier-3'
+    : 'theme-tier-4';
+
   const gridTemplateColumns = `repeat(${size}, 1fr)`;
   const isWarning = timeRatio > 0.8;
   const isShaking = timeRatio > 0.9;
 
   let boardStyle = {
-    ...styles.board,
+    position: 'relative',
+    overflow: 'visible',
+    display: 'grid',
+    gap: '2px',
+    padding: '16px',
+    background: '#0a0c12',
+    borderRadius: '4px',
     gridTemplateColumns,
-    '--time-ratio': timeRatio
+    aspectRatio: '1',
+    maxWidth: '600px',
+    margin: '0 auto',
+    boxShadow: isWarning
+      ? '0 0 0 3px rgba(180, 60, 40, 0.7), 0 0 24px rgba(180, 60, 40, 0.3)'
+      : '0 0 0 2px color-mix(in srgb, var(--board-glow) 60%, transparent)',
+    animation: isShaking ? 'boardShake 0.4s ease-in-out infinite' : 'none',
   };
 
-  if (isWarning) {
-    boardStyle = { ...boardStyle, ...styles.boardWarning };
-  } else {
-    boardStyle = { ...boardStyle, ...styles.boardNormal };
-  }
-
-  if (isShaking) {
-    boardStyle = { ...boardStyle, ...styles.boardShake };
-  }
-
-  // Create a map of valid and warning tiles for quick lookup
+  // Create maps for quick lookup
   const validMap = new Set(validMoves.map(m => `${m[0]},${m[1]}`));
   const warnMap = new Set(warningTiles.map(m => `${m[0]},${m[1]}`));
+  const runeMap = new Map((safeRuneSequence || []).map(r => [`${r.pos[0]},${r.pos[1]}`, r.symbol]));
+  const trailMap = new Map((trail || []).map(t => [`${t.pos[0]},${t.pos[1]}`, t.age]));
+  const visibleSet = visibleCells || new Set();
 
   return (
-    <div style={boardStyle}>
+    <div style={boardStyle} className={tierClass}>
+      <ParticleBackground />
+      <TorchCorners />
+
+      {/* Atmosphere overlay */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          pointerEvents: 'none',
+          zIndex: 0,
+          background: 'radial-gradient(ellipse at center, var(--atmosphere) 0%, transparent 70%)',
+          animation: 'atmospherePulse 4s ease-in-out infinite',
+        }}
+      />
+
       {grid.map((row, r) =>
         row.map((cell, c) => {
           const key = `${r},${c}`;
@@ -71,17 +84,18 @@ export function Board({
           const isWarn = warnMap.has(key);
           const isCrumbling = crumbling && crumbling[0] === r && crumbling[1] === c;
           const isJumping = jumpAnim && jumpAnim[0] === r && jumpAnim[1] === c;
-
-          // Add Warnsdorff score to cell for hint rendering
-          const cellWithScore = {
-            ...cell,
-            warnsdorffScore: isValid ? getWarnsdorffScore(grid, [r, c], size) : 0
-          };
+          const isFogHidden = fogOfWar && !visibleSet.has(key);
+          const isCursed = cell.isCursed && !cell.visited;
+          const isRune = runeMap.has(key) && !cell.visited;
+          const runeSymbol = runeMap.get(key);
+          const trailAge = trailMap.has(key) ? trailMap.get(key) : null;
+          const isTrail = trailAge !== null;
+          const warnsdorffScore = isValid ? getWarnsdorffScore(grid, [r, c], size) : 0;
 
           return (
             <Tile
               key={key}
-              cell={cellWithScore}
+              cell={cell}
               isKnight={isKnight}
               isValid={isValid}
               isWarn={isWarn}
@@ -89,6 +103,15 @@ export function Board({
               isJumping={isJumping}
               hintMode={hintMode}
               onClick={() => onMove(r, c)}
+              isTrail={isTrail}
+              isRune={isRune}
+              runeIndex={-1}
+              cipherFailed={cipherFailed}
+              isFogHidden={isFogHidden}
+              isCursed={isCursed}
+              trailAge={trailAge}
+              warnsdorffScore={warnsdorffScore}
+              runeSymbol={runeSymbol}
             />
           );
         })

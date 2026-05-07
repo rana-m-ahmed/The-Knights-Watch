@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 /**
  * Custom hook for countdown timer
@@ -38,8 +38,17 @@ export function useTimer({ timeLimit, active, onExpire, resetKey }) {
     }
   }, [active]);
 
+  const penalizeTime = useCallback((seconds) => {
+    if (timeLimit === null) return;
+    setTimeElapsed(prev => {
+      const next = Math.min(prev + Number(seconds || 0), timeLimit);
+      if (next >= timeLimit && onExpire) onExpire();
+      return next;
+    });
+  }, [timeLimit, onExpire]);
+
   const timeRemaining = timeLimit !== null ? Math.max(0, timeLimit - timeElapsed) : 0;
   const timeRatio = timeLimit !== null ? timeElapsed / timeLimit : 0;
 
-  return { timeElapsed, timeRemaining, timeRatio };
+  return { timeElapsed, timeRemaining, timeRatio, penalizeTime };
 }

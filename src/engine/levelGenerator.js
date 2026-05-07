@@ -17,11 +17,12 @@ function mulberry32(seed) {
 
 /**
  * Build a grid for a given level configuration
- * @param {Object} levelConfig - { size, chasmCount, startPos, seed }
- * @returns {Array<Array<Object>>} 2D grid with cells: { isChasm, visited, isStart }
+ * @param {Object} levelConfig - { size, chasmCount, cursedCount, startPos, seed }
+ * @returns {Array<Array<Object>>} 2D grid with cells: { isChasm, isCursed, visited, isStart }
  */
 export function buildGrid(levelConfig) {
-  const { size, chasmCount, startPos, seed } = levelConfig;
+  const { size, chasmCount, cursedCount = 0, startPos = [0, 0], seed } = levelConfig;
+
   // Helper: get adjacent cells (8 surrounding cells)
   function getAdjacentCells(r, c) {
     const adjacent = [];
@@ -55,7 +56,7 @@ export function buildGrid(levelConfig) {
       .map(() =>
         Array(size)
           .fill(null)
-          .map(() => ({ isChasm: false, visited: false, isStart: false }))
+          .map(() => ({ isChasm: false, isCursed: false, visited: false, isStart: false }))
       );
 
     const availableCells = [];
@@ -71,6 +72,7 @@ export function buildGrid(levelConfig) {
       break;
     }
 
+    // Shuffle and place chasms
     const pool = availableCells.slice();
     let placedChasms = 0;
 
@@ -84,17 +86,39 @@ export function buildGrid(levelConfig) {
     grid[startPos[0]][startPos[1]].visited = true;
     grid[startPos[0]][startPos[1]].isStart = true;
 
+    // Check solvability with chasms
     if (placedChasms === chasmCount && isSolvable(grid, startPos, size)) {
+      // Now place cursed tiles from non-chasm, non-protected positions
+      const cursedPool = [];
+      for (let r = 0; r < size; r++) {
+        for (let c = 0; c < size; c++) {
+          const key = `${r},${c}`;
+          if (!grid[r][c].isChasm && !protectedCells.has(key) && key !== `${startPos[0]},${startPos[1]}`) {
+            cursedPool.push([r, c]);
+          }
+        }
+      }
+
+      // Shuffle cursed pool and place cursed tiles
+      let placedCursed = 0;
+      while (placedCursed < cursedCount && cursedPool.length > 0) {
+        const index = Math.floor(rng() * cursedPool.length);
+        const [r, c] = cursedPool.splice(index, 1)[0];
+        grid[r][c].isCursed = true;
+        placedCursed++;
+      }
+
       return grid;
     }
   }
 
+  // Fallback grid
   const fallbackGrid = Array(size)
     .fill(null)
     .map(() =>
       Array(size)
         .fill(null)
-        .map(() => ({ isChasm: false, visited: false, isStart: false }))
+        .map(() => ({ isChasm: false, isCursed: false, visited: false, isStart: false }))
     );
   fallbackGrid[startPos[0]][startPos[1]].visited = true;
   fallbackGrid[startPos[0]][startPos[1]].isStart = true;
