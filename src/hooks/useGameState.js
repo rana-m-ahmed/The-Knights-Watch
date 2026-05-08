@@ -1,7 +1,18 @@
 import { useState, useCallback, useEffect } from 'react';
 import { buildGrid } from '../engine/levelGenerator.js';
-import { getValidMoves, getWarnsdorffScore, countTiles } from '../engine/knightLogic.js';
+import { getValidMoves, countTiles } from '../engine/knightLogic.js';
 import { useTimer } from './useTimer.js';
+
+function cloneGrid(sourceGrid) {
+  return sourceGrid.map(row => row.map(cell => ({ ...cell })));
+}
+
+function cloneTrail(sourceTrail) {
+  return sourceTrail.map(entry => ({
+    pos: [...entry.pos],
+    age: entry.age,
+  }));
+}
 
 export function useGameState(levelConfig, onGameStateChange = () => {}) {
   const [grid, setGrid] = useState([]);
@@ -37,6 +48,7 @@ export function useGameState(levelConfig, onGameStateChange = () => {}) {
     const total = countTiles(newGrid);
     const [sr, sc] = config.startPos || [0, 0];
     const initialMoves = getValidMoves(newGrid, [sr, sc], config.size);
+    const initialVisibleCells = new Set();
 
     const safe = (config.runeSequence || []).filter(entry => {
       const [r, c] = entry.pos;
@@ -44,6 +56,17 @@ export function useGameState(levelConfig, onGameStateChange = () => {}) {
              c >= 0 && c < config.size &&
              !newGrid[r][c].isChasm;
     });
+
+    if (config.fogOfWar) {
+      initialVisibleCells.add(`${sr},${sc}`);
+      [[-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]].forEach(([dr, dc]) => {
+        const nr = sr + dr;
+        const nc = sc + dc;
+        if (nr >= 0 && nr < config.size && nc >= 0 && nc < config.size) {
+          initialVisibleCells.add(`${nr},${nc}`);
+        }
+      });
+    }
 
     setGrid(newGrid);
     setKnightPos([sr, sc]);
@@ -63,28 +86,20 @@ export function useGameState(levelConfig, onGameStateChange = () => {}) {
     setSafeRuneSequence(safe);
     setCurrentLevel(config);
     setHistory([{
-      grid: newGrid.map(row => row.map(cell => ({ ...cell }))),
+      grid: cloneGrid(newGrid),
       pos: [sr, sc],
-      visitedCount: 1
+      visitedCount: 1,
+      moveCount: 0,
+      visibleCells: new Set(initialVisibleCells),
+      trail: [],
+      runeProgress: [],
+      cipherSolved: false,
+      cipherFailed: false,
     }]);
-
-    if (config.fogOfWar) {
-      const visible = new Set();
-      visible.add(`${sr},${sc}`);
-      [[-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]].forEach(([dr, dc]) => {
-        const nr = sr + dr;
-        const nc = sc + dc;
-        if (nr >= 0 && nr < config.size && nc >= 0 && nc < config.size) {
-          visible.add(`${nr},${nc}`);
-        }
-      });
-      setVisibleCells(visible);
-    } else {
-      setVisibleCells(new Set());
-    }
+    setVisibleCells(initialVisibleCells);
   }, []);
 
-  const updateWarningTiles = useCallback((currentGrid, currentPos) => {
+  const updateWarningTiles = useCallback((currentGrid, currentPos, currentVisitedCount = visitedCount) => {
     if (!currentLevel || !currentGrid || currentGrid.length === 0) return;
 
     const moves = getValidMoves(currentGrid, currentPos, currentLevel.size);
@@ -95,7 +110,7 @@ export function useGameState(levelConfig, onGameStateChange = () => {}) {
       testGrid[mr][mc].visited = true;
       const nextMoves = getValidMoves(testGrid, [mr, mc], currentLevel.size);
 
-      if (nextMoves.length === 0 && visitedCount + 1 < totalTiles) {
+      if (nextMoves.length === 0 && currentVisitedCount + 1 < totalTiles) {
         warnings.push([mr, mc]);
       }
     }
@@ -109,9 +124,13 @@ export function useGameState(levelConfig, onGameStateChange = () => {}) {
     const isValid = validMoves.some(([mr, mc]) => mr === r && mc === c);
     if (!isValid) return;
 
-    const newGrid = grid.map(row => row.map(cell => ({ ...cell })));
+    const newGrid = cloneGrid(grid);
     const [pr, pc] = knightPos;
     newGrid[r][c].visited = true;
+
+    let nextRuneProgress = runeProgress;
+    let nextCipherSolved = cipherSolved;
+    let nextCipherFailed = cipherFailed;
 
     if (newGrid[r][c].isCursed && currentLevel.timeLimit) {
       penalizeTime(8);
@@ -125,14 +144,13 @@ export function useGameState(levelConfig, onGameStateChange = () => {}) {
     if (runeEntry) {
       const expected = safeRuneSequence[runeProgress.length];
       if (expected && runeEntry.symbol === expected.symbol) {
-        const nextProgress = [...runeProgress, runeEntry.symbol];
-        setRuneProgress(nextProgress);
-        if (nextProgress.length === safeRuneSequence.length) {
-          setCipherSolved(true);
+        nextRuneProgress = [...runeProgress, runeEntry.symbol];
+        if (nextRuneProgress.length === safeRuneSequence.length) {
+          nextCipherSolved = true;
           penalizeTime(-15);
         }
       } else {
-        setCipherFailed(true);
+        nextCipherFailed = true;
       }
     }
 
@@ -141,12 +159,31 @@ export function useGameState(levelConfig, onGameStateChange = () => {}) {
     setJumpAnim([r, c]);
     setTimeout(() => setJumpAnim(null), 300);
 
-    setTrail(prev => {
-      const aged = prev
+    const nextTrail = [
+      { pos: [r, c], age: 0 },
+      ...trail
         .map(t => ({ ...t, age: t.age + 1 }))
-        .filter(t => t.age < 4);
-      return [{ pos: [r, c], age: 0 }, ...aged];
-    });
+        .filter(t => t.age < 4),
+    ];
+
+    const nextVisibleCells = new Set();
+    if (currentLevel.fogOfWar) {
+      for (let rr = 0; rr < newGrid.length; rr++) {
+        for (let cc = 0; cc < newGrid[rr].length; cc++) {
+          if (newGrid[rr][cc].visited) {
+            nextVisibleCells.add(`${rr},${cc}`);
+          }
+        }
+      }
+      nextVisibleCells.add(`${r},${c}`);
+      [[-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]].forEach(([dr, dc]) => {
+        const nr = r + dr;
+        const nc = c + dc;
+        if (nr >= 0 && nr < currentLevel.size && nc >= 0 && nc < currentLevel.size) {
+          nextVisibleCells.add(`${nr},${nc}`);
+        }
+      });
+    }
 
     const newVisitedCount = visitedCount + 1;
     const newMoveCount = moveCount + 1;
@@ -155,41 +192,38 @@ export function useGameState(levelConfig, onGameStateChange = () => {}) {
     setKnightPos([r, c]);
     setVisitedCount(newVisitedCount);
     setMoveCount(newMoveCount);
-
-    if (currentLevel.fogOfWar) {
-      const visible = new Set();
-      for (let rr = 0; rr < newGrid.length; rr++) {
-        for (let cc = 0; cc < newGrid[rr].length; cc++) {
-          if (newGrid[rr][cc].visited) {
-            visible.add(`${rr},${cc}`);
-          }
-        }
-      }
-      visible.add(`${r},${c}`);
-      [[-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]].forEach(([dr, dc]) => {
-        const nr = r + dr;
-        const nc = c + dc;
-        if (nr >= 0 && nr < currentLevel.size && nc >= 0 && nc < currentLevel.size) {
-          visible.add(`${nr},${nc}`);
-        }
-      });
-      setVisibleCells(visible);
-    }
+    setTrail(nextTrail);
+    setRuneProgress(nextRuneProgress);
+    setCipherSolved(nextCipherSolved);
+    setCipherFailed(nextCipherFailed);
+    setVisibleCells(nextVisibleCells);
 
     const newMoves = getValidMoves(newGrid, [r, c], currentLevel.size);
     setValidMoves(newMoves);
-    updateWarningTiles(newGrid, [r, c]);
+    updateWarningTiles(newGrid, [r, c], newVisitedCount);
 
     setHistory(prev => [...prev, {
-      grid: newGrid.map(row => row.map(cell => ({ ...cell }))),
+      grid: cloneGrid(newGrid),
       pos: [r, c],
-      visitedCount: newVisitedCount
+      visitedCount: newVisitedCount,
+      moveCount: newMoveCount,
+      visibleCells: new Set(nextVisibleCells),
+      trail: cloneTrail(nextTrail),
+      runeProgress: [...nextRuneProgress],
+      cipherSolved: nextCipherSolved,
+      cipherFailed: nextCipherFailed,
     }]);
 
     if (newVisitedCount === totalTiles) {
       setTimeout(() => {
         setGameState('won');
-        onGameStateChange('won');
+        onGameStateChange('won', {
+          undoUsed,
+          timeRatio,
+          moveCount: newMoveCount,
+          totalTiles,
+          timerEnabled: currentLevel.timeLimit !== null,
+        });
       }, 400);
     } else if (newMoves.length === 0) {
       setTimeout(() => {
@@ -197,7 +231,7 @@ export function useGameState(levelConfig, onGameStateChange = () => {}) {
         onGameStateChange('lost');
       }, 400);
     }
-  }, [gameState, currentLevel, validMoves, grid, knightPos, visitedCount, totalTiles, moveCount, safeRuneSequence, runeProgress, penalizeTime, updateWarningTiles, onGameStateChange]);
+  }, [gameState, currentLevel, validMoves, grid, knightPos, visitedCount, totalTiles, moveCount, safeRuneSequence, runeProgress, cipherSolved, cipherFailed, trail, penalizeTime, updateWarningTiles, onGameStateChange, undoUsed, timeRatio]);
 
   const handleUndo = useCallback(() => {
     if (history.length <= 1 || !currentLevel) return;
@@ -207,16 +241,26 @@ export function useGameState(levelConfig, onGameStateChange = () => {}) {
     const prev = newHistory[newHistory.length - 1];
 
     setHistory(newHistory);
-    setGrid(prev.grid.map(row => row.map(cell => ({ ...cell }))));
+    setGrid(cloneGrid(prev.grid));
     setKnightPos(prev.pos);
     setVisitedCount(prev.visitedCount);
-    setMoveCount(m => m - 1);
+    setMoveCount(prev.moveCount ?? Math.max(0, prev.visitedCount - 1));
     setGameState('playing');
+    setTrail(cloneTrail(prev.trail || []));
+    setRuneProgress([...(prev.runeProgress || [])]);
+    setCipherSolved(Boolean(prev.cipherSolved));
+    setCipherFailed(Boolean(prev.cipherFailed));
+    setVisibleCells(new Set(prev.visibleCells || []));
+    setCrumbling([]);
+    setJumpAnim(null);
+    setCursedHit(null);
 
     const newMoves = getValidMoves(prev.grid, prev.pos, currentLevel.size);
     setValidMoves(newMoves);
-    updateWarningTiles(prev.grid, prev.pos);
+    updateWarningTiles(prev.grid, prev.pos, prev.visitedCount);
   }, [history, currentLevel, updateWarningTiles]);
+
+  const canUndo = gameState === 'playing' && history.length > 1;
 
   useEffect(() => {
     if (levelConfig && levelConfig.id !== undefined) {
@@ -236,6 +280,8 @@ export function useGameState(levelConfig, onGameStateChange = () => {}) {
     jumpAnim,
     moveCount,
     undoUsed,
+    history,
+    canUndo,
     cursedHit,
     visibleCells,
     trail,

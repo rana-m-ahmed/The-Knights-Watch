@@ -108,7 +108,7 @@ const styles = {
   }
 };
 
-export function LevelSelect({ levelStars, onSelectLevel }) {
+export function LevelSelect({ levelStars, onSelectLevel, onBackToTitle }) {
   const [activeTier, setActiveTier] = useState('Tier I');
   const [hoveredCard, setHoveredCard] = useState(null);
 
@@ -133,6 +133,23 @@ export function LevelSelect({ levelStars, onSelectLevel }) {
     <div style={styles.container}>
       <div style={styles.header}>
         <div style={styles.title}>Level Select</div>
+        <button
+          style={{
+            marginTop: '16px',
+            padding: '10px 18px',
+            background: 'rgba(120,100,60,0.1)',
+            border: '1px solid rgba(180,150,80,0.3)',
+            color: '#d4c5a9',
+            cursor: 'pointer',
+            fontSize: '13px',
+            fontWeight: '600',
+            borderRadius: '4px',
+            fontFamily: 'Georgia, "Times New Roman", serif',
+          }}
+          onClick={onBackToTitle}
+        >
+          Back to Title
+        </button>
       </div>
 
       <div style={styles.tabs}>

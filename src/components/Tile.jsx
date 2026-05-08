@@ -11,8 +11,6 @@ export function Tile({
   onClick,
   isTrail,
   isRune,
-  runeIndex,
-  cipherFailed,
   isFogHidden,
   isCursed,
   trailAge,
@@ -35,6 +33,8 @@ export function Tile({
     overflow: 'hidden',
   };
 
+  const isVisitedCrumbled = cell.visited && !isKnight;
+
   // Fog hidden (void tile) — override everything
   if (isFogHidden) {
     return (
@@ -51,12 +51,26 @@ export function Tile({
     );
   }
 
-  // Crumbled state
+  // Visited crumbled remnant
+  if (isVisitedCrumbled) {
+    baseStyle = {
+      ...baseStyle,
+      background: 'linear-gradient(135deg, #0d0b07 0%, #080604 100%)',
+      border: '1px solid rgba(60,50,30,0.3)',
+      boxShadow: 'inset 0 0 8px rgba(0,0,0,0.8)',
+      cursor: 'default',
+    };
+  }
+
+  // Crumbling animation overrides the visited remnant
   if (isCrumbling) {
     baseStyle = {
       ...baseStyle,
-      opacity: 0.2,
-      transform: 'scale(0.8)',
+      opacity: 0.15,
+      transform: 'scale(0.75)',
+      transition: 'opacity 0.45s ease-in, transform 0.45s ease-in',
+      background: 'var(--tile-bg)',
+      filter: 'brightness(0.3)',
     };
   }
 
@@ -69,7 +83,7 @@ export function Tile({
   }
 
   // Valid tile
-  if (isValid && !isFogHidden) {
+  if (isValid && !isFogHidden && !isVisitedCrumbled && !isCrumbling) {
     baseStyle = {
       ...baseStyle,
       background: 'var(--tile-valid-bg)',
@@ -80,7 +94,7 @@ export function Tile({
   }
 
   // Warning tile (overrides valid)
-  if (isWarn && !isFogHidden) {
+  if (isWarn && !isFogHidden && !isVisitedCrumbled && !isCrumbling) {
     baseStyle = {
       ...baseStyle,
       background: 'var(--tile-valid-bg)',
@@ -125,6 +139,10 @@ export function Tile({
   let hintContent = '';
   if (isKnight) {
     hintContent = '♞';
+  } else if (isCrumbling) {
+    hintContent = '';
+  } else if (isVisitedCrumbled) {
+    hintContent = '▪';
   } else if (isValid && hintMode === 'full') {
     hintContent = warnsdorffScore > 0 ? String(warnsdorffScore) : '';
   } else if (isValid && hintMode === 'warn') {
@@ -141,8 +159,14 @@ export function Tile({
         ...baseStyle,
         filter: knightFilter,
       }}
+      animate={isCrumbling
+        ? { opacity: 0.15, scale: 0.75 }
+        : cell.visited && !isKnight
+          ? { opacity: 1, scale: 1 }
+          : { opacity: 1, scale: 1 }
+      }
+      transition={{ duration: isCrumbling ? 0.45 : 0.15 }}
       whileTap={isValid ? { scale: 0.92 } : {}}
-      transition={{ duration: 0.12 }}
       onClick={onClick}
       role="button"
       tabIndex={isValid ? 0 : -1}
@@ -197,7 +221,15 @@ export function Tile({
 
       {/* Hint content */}
       {hintContent && !isCursed && !isRune && (
-        <span style={{ fontSize: isKnight ? '28px' : '14px' }}>{hintContent}</span>
+        <span
+          style={{
+            fontSize: isVisitedCrumbled ? 'clamp(6px,1.5vw,10px)' : isKnight ? '28px' : '14px',
+            color: isVisitedCrumbled ? '#3a3020' : undefined,
+            opacity: isVisitedCrumbled ? 0.45 : 1,
+          }}
+        >
+          {hintContent}
+        </span>
       )}
     </motion.div>
   );

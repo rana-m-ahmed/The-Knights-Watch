@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { IntroScreen } from './components/IntroScreen.jsx';
 import { LevelSelect } from './components/LevelSelect.jsx';
 import { Board } from './components/Board.jsx';
 import { HUD } from './components/HUD.jsx';
 import { CipherPanel } from './components/CipherPanel.jsx';
+import { TierTutorialBanner } from './components/TierTutorialBanner.jsx';
 import { Overlay } from './components/Overlay.jsx';
 import { useGameState } from './hooks/useGameState.js';
 import { DEV_MODE, LEVELS } from './data/levelData.js';
@@ -12,6 +13,7 @@ import { getStars } from './engine/scoring.js';
 function App() {
   const [screen, setScreen] = useState('intro');
   const [currentLevelIndex, setCurrentLevelIndex] = useState(0);
+  const [bannerDismissed, setBannerDismissed] = useState(false);
   const [levelStars, setLevelStars] = useState(() => {
     const saved = localStorage.getItem('ko-stars');
     return saved ? JSON.parse(saved) : Array(16).fill(0);
@@ -20,14 +22,14 @@ function App() {
   const currentLevel = LEVELS[currentLevelIndex];
   const game = useGameState(
     screen === 'game' ? currentLevel : null,
-    (newGameState) => {
+    (newGameState, payload) => {
       if (newGameState === 'won') {
         const stars = getStars({
-          undoUsed: game.undoUsed,
-          timeRatio: game.timeRatio,
-          moveCount: game.moveCount,
-          totalTiles: game.totalTiles,
-          timerEnabled: currentLevel.timeLimit !== null
+          undoUsed: payload?.undoUsed ?? false,
+          timeRatio: payload?.timeRatio ?? 0,
+          moveCount: payload?.moveCount ?? 0,
+          totalTiles: payload?.totalTiles ?? 0,
+          timerEnabled: payload?.timerEnabled ?? currentLevel.timeLimit !== null
         });
 
         const newStars = [...levelStars];
@@ -42,11 +44,13 @@ function App() {
 
   const handleNextLevel = () => {
     if (currentLevelIndex < LEVELS.length - 1) {
+      setBannerDismissed(false);
       setCurrentLevelIndex(currentLevelIndex + 1);
     }
   };
 
   const handleRetryLevel = () => {
+    setBannerDismissed(false);
     game.initLevel(currentLevel);
   };
 
@@ -54,19 +58,15 @@ function App() {
     setScreen('select');
   };
 
+  const handleBackToTitle = () => {
+    setScreen('intro');
+  };
+
   const handleSelectLevel = (levelIndex) => {
+    setBannerDismissed(false);
     setCurrentLevelIndex(levelIndex);
     setScreen('game');
   };
-
-  // Derive tier class from level index
-  const tierClass = currentLevelIndex < 4
-    ? 'theme-tier-1'
-    : currentLevelIndex < 8
-    ? 'theme-tier-2'
-    : currentLevelIndex < 12
-    ? 'theme-tier-3'
-    : 'theme-tier-4';
 
   // Derive active mechanic from tier
   const activeMechanic = currentLevelIndex < 4
@@ -87,14 +87,14 @@ function App() {
   }
 
   if (screen === 'select') {
-    return <LevelSelect levelStars={levelStars} onSelectLevel={handleSelectLevel} />;
+    return <LevelSelect levelStars={levelStars} onSelectLevel={handleSelectLevel} onBackToTitle={handleBackToTitle} />;
   }
 
   if (screen === 'game' && game && game.grid && game.grid.length > 0) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: 'linear-gradient(160deg, #0a0c12 0%, #111520 50%, #0d0f1a 100%)', color: '#d4c5a9' }}>
         {DEV_MODE && (
-          <div style={{ position: 'fixed', top: '12px', right: '12px', zIndex: 999, padding: '8px 10px', background: 'rgba(10,12,18,0.78)', border: '1px solid rgba(240,192,64,0.35)', borderRadius: '4px', color: '#d4c5a9', fontFamily: 'monospace', fontSize: '11px', lineHeight: 1.4, pointerEvents: 'none', whiteSpace: 'pre-line' }}>
+          <div style={{ position: 'fixed', bottom: '12px', right: '12px', zIndex: 999, padding: '8px 10px', background: 'rgba(10,12,18,0.78)', border: '1px solid rgba(240,192,64,0.35)', borderRadius: '4px', color: '#d4c5a9', fontFamily: 'monospace', fontSize: '11px', lineHeight: 1.4, pointerEvents: 'none', whiteSpace: 'pre-line' }}>
             {`Level: ${currentLevelIndex + 1} | Size: ${currentLevel.size}×${currentLevel.size}\nChasms: ${currentLevel.chasmCount} | Timer: ${currentLevel.timeLimit ?? 'none'}s\nHint: ${currentLevel.hintMode} | Seed: ${currentLevel.seed}`}
           </div>
         )}
@@ -113,6 +113,14 @@ function App() {
         />
 
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', position: 'relative' }}>
+          {currentLevel.firstOfTier && (
+            <TierTutorialBanner
+              tier={currentLevel.tier}
+              mechanic={activeMechanic}
+              dismissed={bannerDismissed}
+              onDismiss={() => setBannerDismissed(true)}
+            />
+          )}
           <div style={{ position: 'relative', maxWidth: '600px', width: '100%', aspectRatio: '1' }}>
             <Board
               grid={game.grid}
@@ -132,6 +140,7 @@ function App() {
               visibleCells={game.visibleCells}
               fogOfWar={currentLevel.fogOfWar}
               levelIdx={currentLevelIndex}
+              firstOfTier={currentLevel.firstOfTier}
             />
 
             <Overlay
@@ -166,16 +175,16 @@ function App() {
                 background: 'rgba(180, 150, 80, 0.2)',
                 border: '1px solid rgba(180, 150, 80, 0.5)',
                 color: '#f0c040',
-                cursor: game.history && game.history.length > 1 ? 'pointer' : 'not-allowed',
+                cursor: game.canUndo ? 'pointer' : 'not-allowed',
                 fontSize: '14px',
                 fontWeight: '600',
                 borderRadius: '4px',
                 fontFamily: 'Georgia, "Times New Roman", serif',
                 transition: 'all 0.2s ease',
-                opacity: game.history && game.history.length > 1 ? 1 : 0.3,
+                opacity: game.canUndo ? 1 : 0.3,
               }}
               onClick={game.handleUndo}
-              disabled={!game.history || game.history.length <= 1}
+              disabled={!game.canUndo}
             >
               Undo
             </button>
@@ -194,7 +203,7 @@ function App() {
               }}
               onClick={handleBackToSelect}
             >
-              Back to Menu
+              Back to Levels
             </button>
           </div>
         </div>

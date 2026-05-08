@@ -7,14 +7,15 @@ export const LEVELS = [
     tier: "Tier I",
     tierName: "The Courtyard",
     size: 4,
-    chasmCount: 0,
+    chasmCount: 1,
     cursedCount: 0,
     fogOfWar: false,
     runeSequence: [],
     timeLimit: null,
     startPos: [0, 0],
     seed: 1001,
-    hintMode: "full"
+    hintMode: "full",
+    firstOfTier: true
   },
   {
     id: 2,
@@ -29,7 +30,8 @@ export const LEVELS = [
     timeLimit: null,
     startPos: [0, 0],
     seed: 1002,
-    hintMode: "full"
+    hintMode: "full",
+    firstOfTier: false
   },
   {
     id: 3,
@@ -44,7 +46,8 @@ export const LEVELS = [
     timeLimit: null,
     startPos: [0, 2],
     seed: 1003,
-    hintMode: "warn"
+    hintMode: "warn",
+    firstOfTier: false
   },
   {
     id: 4,
@@ -59,7 +62,8 @@ export const LEVELS = [
     timeLimit: null,
     startPos: [0, 0],
     seed: 1004,
-    hintMode: "warn"
+    hintMode: "warn",
+    firstOfTier: false
   },
   {
     id: 5,
@@ -74,7 +78,8 @@ export const LEVELS = [
     timeLimit: 60,
     startPos: [0, 0],
     seed: 1005,
-    hintMode: "warn"
+    hintMode: "warn",
+    firstOfTier: true
   },
   {
     id: 6,
@@ -89,7 +94,8 @@ export const LEVELS = [
     timeLimit: 50,
     startPos: [0, 0],
     seed: 1006,
-    hintMode: "warn"
+    hintMode: "warn",
+    firstOfTier: false
   },
   {
     id: 7,
@@ -104,7 +110,8 @@ export const LEVELS = [
     timeLimit: 45,
     startPos: [0, 0],
     seed: 1007,
-    hintMode: "warn"
+    hintMode: "warn",
+    firstOfTier: false
   },
   {
     id: 8,
@@ -119,7 +126,8 @@ export const LEVELS = [
     timeLimit: 55,
     startPos: [0, 0],
     seed: 1008,
-    hintMode: "none"
+    hintMode: "none",
+    firstOfTier: false
   },
   {
     id: 9,
@@ -133,8 +141,9 @@ export const LEVELS = [
     runeSequence: [],
     timeLimit: 40,
     startPos: [0, 0],
-    seed: 1009,
-    hintMode: "none"
+    seed: 1070,
+    hintMode: "none",
+    firstOfTier: true
   },
   {
     id: 10,
@@ -149,7 +158,8 @@ export const LEVELS = [
     timeLimit: 30,
     startPos: [0, 0],
     seed: 1010,
-    hintMode: "none"
+    hintMode: "none",
+    firstOfTier: false
   },
   {
     id: 11,
@@ -164,7 +174,8 @@ export const LEVELS = [
     timeLimit: 45,
     startPos: [0, 3],
     seed: 1011,
-    hintMode: "none"
+    hintMode: "none",
+    firstOfTier: false
   },
   {
     id: 12,
@@ -179,7 +190,8 @@ export const LEVELS = [
     timeLimit: 50,
     startPos: [0, 0],
     seed: 1012,
-    hintMode: "none"
+    hintMode: "none",
+    firstOfTier: false
   },
   {
     id: 13,
@@ -200,7 +212,8 @@ export const LEVELS = [
     timeLimit: 35,
     startPos: [0, 0],
     seed: 1013,
-    hintMode: "none"
+    hintMode: "none",
+    firstOfTier: true
   },
   {
     id: 14,
@@ -221,7 +234,8 @@ export const LEVELS = [
     timeLimit: 40,
     startPos: [0, 4],
     seed: 1014,
-    hintMode: "none"
+    hintMode: "none",
+    firstOfTier: false
   },
   {
     id: 15,
@@ -242,7 +256,8 @@ export const LEVELS = [
     timeLimit: 50,
     startPos: [0, 0],
     seed: 1015,
-    hintMode: "none"
+    hintMode: "none",
+    firstOfTier: false
   },
   {
     id: 16,
@@ -257,12 +272,13 @@ export const LEVELS = [
       { pos: [0, 4], symbol: "Σ" },
       { pos: [2, 7], symbol: "Δ" },
       { pos: [5, 3], symbol: "Φ" },
-      { pos: [7, 1], symbol: "Ξ" },
+      { pos: [6, 1], symbol: "Ξ" },
       { pos: [3, 5], symbol: "Λ" }
     ],
     timeLimit: 25,
     startPos: [0, 0],
     seed: 1016,
-    hintMode: "none"
+    hintMode: "none",
+    firstOfTier: false
   }
 ];

@@ -1,7 +1,7 @@
 import { Tile } from './Tile.jsx';
 import { ParticleBackground } from './ParticleBackground.jsx';
 import { TorchCorners } from './TorchCorners.jsx';
-import { getValidMoves, getWarnsdorffScore } from '../engine/knightLogic.js';
+import { getWarnsdorffScore } from '../engine/knightLogic.js';
 
 export function Board({
   grid,
@@ -16,11 +16,11 @@ export function Board({
   onMove,
   trail,
   safeRuneSequence,
-  runeProgress,
   cipherFailed,
   visibleCells,
   fogOfWar,
   levelIdx,
+  firstOfTier,
 }) {
   const tierClass = levelIdx < 4
     ? 'theme-tier-1'
@@ -58,6 +58,7 @@ export function Board({
   const runeMap = new Map((safeRuneSequence || []).map(r => [`${r.pos[0]},${r.pos[1]}`, r.symbol]));
   const trailMap = new Map((trail || []).map(t => [`${t.pos[0]},${t.pos[1]}`, t.age]));
   const visibleSet = visibleCells || new Set();
+  const effectiveHintMode = firstOfTier ? 'full' : hintMode;
 
   return (
     <div style={boardStyle} className={tierClass}>
@@ -101,12 +102,10 @@ export function Board({
               isWarn={isWarn}
               isCrumbling={isCrumbling}
               isJumping={isJumping}
-              hintMode={hintMode}
+              hintMode={effectiveHintMode}
               onClick={() => onMove(r, c)}
               isTrail={isTrail}
               isRune={isRune}
-              runeIndex={-1}
-              cipherFailed={cipherFailed}
               isFogHidden={isFogHidden}
               isCursed={isCursed}
               trailAge={trailAge}
