@@ -17,6 +17,7 @@ export function Tile({
   warnsdorffScore,
   runeSymbol,
 }) {
+  const isChasm = Boolean(cell?.isChasm);
   let baseStyle = {
     aspectRatio: '1',
     background: 'var(--tile-bg)',
@@ -62,6 +63,17 @@ export function Tile({
     };
   }
 
+  // Chasm tile appearance
+  if (isChasm && !isKnight) {
+    baseStyle = {
+      ...baseStyle,
+      background: 'radial-gradient(circle at 50% 45%, #06080d 0%, #020304 60%, #000 100%)',
+      border: '1px solid rgba(80, 90, 110, 0.35)',
+      boxShadow: 'inset 0 0 10px rgba(0, 0, 0, 0.9)',
+      cursor: 'default',
+    };
+  }
+
   // Crumbling animation overrides the visited remnant
   if (isCrumbling) {
     baseStyle = {
@@ -83,7 +95,7 @@ export function Tile({
   }
 
   // Valid tile
-  if (isValid && !isFogHidden && !isVisitedCrumbled && !isCrumbling) {
+  if (isValid && !isFogHidden && !isVisitedCrumbled && !isCrumbling && !isChasm) {
     baseStyle = {
       ...baseStyle,
       background: 'var(--tile-valid-bg)',
@@ -94,7 +106,7 @@ export function Tile({
   }
 
   // Warning tile (overrides valid)
-  if (isWarn && !isFogHidden && !isVisitedCrumbled && !isCrumbling) {
+  if (isWarn && !isFogHidden && !isVisitedCrumbled && !isCrumbling && !isChasm) {
     baseStyle = {
       ...baseStyle,
       background: 'var(--tile-valid-bg)',
@@ -115,7 +127,7 @@ export function Tile({
   }
 
   // Cursed tile (not visited, not fog, not knight)
-  if (isCursed && !cell.visited && !isFogHidden && !isKnight) {
+  if (isCursed && !cell.visited && !isFogHidden && !isKnight && !isChasm) {
     baseStyle = {
       ...baseStyle,
       background: '#1a0510',
@@ -125,7 +137,7 @@ export function Tile({
   }
 
   // Rune tile (not visited, not fog, not cursed, not knight)
-  if (isRune && !cell.visited && !isFogHidden && !isKnight && !isCursed) {
+  if (isRune && !cell.visited && !isFogHidden && !isKnight && !isCursed && !isChasm) {
     baseStyle = {
       ...baseStyle,
       background: '#180408',
@@ -168,9 +180,16 @@ export function Tile({
       transition={{ duration: isCrumbling ? 0.45 : 0.15 }}
       whileTap={isValid ? { scale: 0.92 } : {}}
       onClick={onClick}
+      onKeyDown={(e) => {
+        if (!isValid) return;
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick();
+        }
+      }}
       role="button"
       tabIndex={isValid ? 0 : -1}
-      aria-label="Tile"
+      aria-label={isChasm ? 'Chasm tile' : 'Tile'}
     >
       {/* Trail glow overlay */}
       {isTrail && trailAge !== null && !isKnight && (
@@ -193,7 +212,7 @@ export function Tile({
       )}
 
       {/* Cursed tile symbol */}
-      {isCursed && !cell.visited && !isFogHidden && !isKnight && (
+      {isCursed && !cell.visited && !isFogHidden && !isKnight && !isChasm && (
         <span
           style={{
             fontSize: '14px',
@@ -206,7 +225,7 @@ export function Tile({
       )}
 
       {/* Rune symbol */}
-      {isRune && !cell.visited && !isFogHidden && !isKnight && !isCursed && (
+      {isRune && !cell.visited && !isFogHidden && !isKnight && !isCursed && !isChasm && (
         <span
           style={{
             fontSize: '16px',

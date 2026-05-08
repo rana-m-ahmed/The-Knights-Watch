@@ -54,6 +54,11 @@ function App() {
     game.initLevel(currentLevel);
   };
 
+  const handleRestartLevel = () => {
+    setBannerDismissed(false);
+    game.initLevel(currentLevel);
+  };
+
   const handleBackToSelect = () => {
     setScreen('select');
   };
@@ -186,7 +191,7 @@ function App() {
               onClick={game.handleUndo}
               disabled={!game.canUndo}
             >
-              Undo
+              Undo {game.undoUsed ? '-★' : ''}
             </button>
             <button
               style={{
@@ -194,6 +199,23 @@ function App() {
                 background: 'rgba(120, 100, 60, 0.1)',
                 border: '1px solid rgba(180, 150, 80, 0.3)',
                 color: '#d4c5a9',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '600',
+                borderRadius: '4px',
+                fontFamily: 'Georgia, "Times New Roman", serif',
+                transition: 'all 0.2s ease',
+              }}
+              onClick={handleRestartLevel}
+            >
+              Restart
+            </button>
+            <button
+              style={{
+                padding: '10px 24px',
+                background: 'transparent',
+                border: '1px solid rgba(180, 150, 80, 0.2)',
+                color: '#bca77e',
                 cursor: 'pointer',
                 fontSize: '14px',
                 fontWeight: '600',

@@ -27,12 +27,13 @@ export function CipherPanel({
           fontWeight: '700',
           textTransform: 'uppercase',
           letterSpacing: '2px',
+          fontVariant: 'small-caps',
           color: 'rgba(200, 60, 80, 0.8)',
           marginBottom: '12px',
           textAlign: 'center',
         }}
       >
-        ✦ Rune Cipher ✦
+        CIPHER
       </div>
 
       {/* Rune slots */}
@@ -67,28 +68,28 @@ export function CipherPanel({
                 fontWeight: '700',
                 fontFamily: 'Georgia, serif',
                 background: isCorrect
-                  ? 'rgba(140, 180, 240, 0.12)'
+                  ? 'rgba(240, 192, 64, 0.14)'
                   : isFailed
                   ? 'rgba(180, 60, 60, 0.12)'
                   : 'rgba(100, 100, 140, 0.06)',
                 border: isCorrect
-                  ? '1px solid rgba(180, 220, 255, 0.5)'
+                  ? '1px solid rgba(240, 192, 64, 0.7)'
                   : isFailed
                   ? '1px solid rgba(180, 60, 60, 0.6)'
                   : '1px solid rgba(100, 100, 140, 0.2)',
                 boxShadow: isCorrect
-                  ? '0 0 12px rgba(180, 220, 255, 0.3)'
+                  ? '0 0 14px rgba(240, 192, 64, 0.35)'
                   : isFailed
                   ? '0 0 8px rgba(180, 60, 60, 0.2)'
                   : 'none',
                 color: isCorrect
-                  ? '#8df0a6'
+                  ? '#f0c040'
                   : isFailed
                   ? '#ff6b5b'
                   : 'rgba(200, 200, 200, 0.3)',
               }}
             >
-              {isVisited ? (isCorrect ? '●' : '✗') : '○'}
+              {isVisited ? (isCorrect ? rune.symbol : '✗') : '○'}
             </motion.div>
           );
         })}

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { DEV_MODE, LEVELS } from '../data/levelData.js';
+import { LEVELS } from '../data/levelData.js';
 
 const styles = {
   container: {
@@ -116,10 +116,7 @@ export function LevelSelect({ levelStars, onSelectLevel, onBackToTitle }) {
   const tierLevels = LEVELS.filter(level => level.tier === activeTier);
 
   const isLevelLocked = (levelIndex) => {
-    if (DEV_MODE) return false;
-    if (levelIndex === 0) return false; // Level 1 always unlocked
-    const prevLevel = LEVELS[levelIndex - 1];
-    return levelStars[levelIndex - 1] === 0;
+    return false;
   };
 
   const handleSelectLevel = (level) => {
@@ -174,7 +171,8 @@ export function LevelSelect({ levelStars, onSelectLevel, onBackToTitle }) {
           const stars = levelStars[levelIndex] || 0;
 
           return (
-            <div
+            <button
+              type="button"
               key={level.id}
               style={{
                 ...styles.card,
@@ -184,6 +182,8 @@ export function LevelSelect({ levelStars, onSelectLevel, onBackToTitle }) {
               onClick={() => handleSelectLevel(level)}
               onMouseEnter={() => !locked && setHoveredCard(level.id)}
               onMouseLeave={() => setHoveredCard(null)}
+              disabled={locked}
+              aria-label={`Level ${level.id}: ${level.name}`}
             >
               <div style={styles.cardNumber}>Level {level.id}</div>
               <div style={styles.cardName}>{level.name}</div>
@@ -202,7 +202,7 @@ export function LevelSelect({ levelStars, onSelectLevel, onBackToTitle }) {
                   ))}
                 </div>
               )}
-            </div>
+            </button>
           );
         })}
       </div>

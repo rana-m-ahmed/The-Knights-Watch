@@ -20,6 +20,13 @@ export function HUD({
 }) {
   const isTimeWarning = timeLimit && timeRatio > 0.8;
   const timerColor = isTimeWarning ? '#e74c3c' : 'var(--accent)';
+  const mechanicLabel = activeMechanic === 'cursed'
+    ? '⚠ CURSED TILES'
+    : activeMechanic === 'fog'
+    ? '◉ FOG OF WAR'
+    : activeMechanic === 'cipher'
+    ? `Ω CIPHER: ${cipherProgress || '0/0'}`
+    : '';
 
   return (
     <div
@@ -27,7 +34,10 @@ export function HUD({
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: '16px 24px',
+        flexWrap: 'wrap',
+        rowGap: '12px',
+        columnGap: '16px',
+        padding: 'clamp(10px, 2vw, 16px) clamp(12px, 3vw, 24px)',
         background: 'linear-gradient(160deg, #0a0c12 0%, #111520 50%, #0d0f1a 100%)',
         borderBottom: '1px solid color-mix(in srgb, var(--tile-border) 40%, transparent)',
         fontFamily: 'Georgia, "Times New Roman", serif',
@@ -39,7 +49,7 @@ export function HUD({
       <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
         <div
           style={{
-            fontSize: '10px',
+            fontSize: 'clamp(9px, 1.8vw, 10px)',
             fontWeight: '600',
             textTransform: 'uppercase',
             letterSpacing: '2px',
@@ -51,7 +61,7 @@ export function HUD({
         </div>
         <div
           style={{
-            fontSize: '18px',
+            fontSize: 'clamp(15px, 3.2vw, 18px)',
             fontWeight: '600',
             color: '#e8d5a3',
             letterSpacing: '1px',
@@ -62,7 +72,7 @@ export function HUD({
       </div>
 
       {/* Center/Right: Stats */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(10px, 2.8vw, 32px)', flexWrap: 'wrap', justifyContent: 'flex-end', marginLeft: 'auto' }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
           <div style={{ fontSize: '10px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '1px', color: '#8a6c2a', opacity: 0.8 }}>
             Tiles
@@ -84,7 +94,7 @@ export function HUD({
         {timeLimit && (
           <div
             style={{
-              fontSize: '24px',
+              fontSize: 'clamp(18px, 4vw, 24px)',
               fontWeight: '700',
               color: timerColor,
               fontFamily: 'monospace',
@@ -109,20 +119,9 @@ export function HUD({
               border: '1px solid rgba(200, 150, 60, 0.2)',
             }}
           >
-            <span style={{ fontSize: '10px', fontWeight: '700', color: 'var(--accent)', textTransform: 'uppercase' }}>
-              {activeMechanic === 'cursed'
-                ? '✗ Cursed'
-                : activeMechanic === 'fog'
-                ? '◎ Fog'
-                : activeMechanic === 'cipher'
-                ? '✦ Cipher'
-                : activeMechanic}
+            <span style={{ fontSize: '10px', fontWeight: '700', color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '1px' }}>
+              {mechanicLabel}
             </span>
-            {activeMechanic === 'cipher' && cipherProgress && (
-              <div style={{ fontSize: '11px', fontWeight: '600', color: 'rgba(200, 150, 60, 0.7)' }}>
-                {cipherProgress}
-              </div>
-            )}
           </div>
         )}
       </div>
@@ -139,7 +138,7 @@ export function HUD({
             style={{
               position: 'absolute',
               left: '50%',
-              top: '50%',
+              top: '28%',
               transform: 'translateX(-50%) translateY(-50%)',
               pointerEvents: 'none',
               fontSize: '20px',
@@ -147,6 +146,7 @@ export function HUD({
               color: '#e74c3c',
               textShadow: '0 0 8px rgba(231, 76, 60, 0.5)',
               fontFamily: 'monospace',
+              animation: 'fadeUp 0.9s ease-out',
             }}
           >
             -8s

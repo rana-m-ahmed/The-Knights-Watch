@@ -21,7 +21,7 @@ function mulberry32(seed) {
  * @returns {Array<Array<Object>>} 2D grid with cells: { isChasm, isCursed, visited, isStart }
  */
 export function buildGrid(levelConfig) {
-  const { size, chasmCount, cursedCount = 0, startPos = [0, 0], seed } = levelConfig;
+  const { size, chasmCount, cursedCount = 0, startPos = [0, 0], seed, runeSequence = [] } = levelConfig;
 
   // Helper: get adjacent cells (8 surrounding cells)
   function getAdjacentCells(r, c) {
@@ -44,6 +44,13 @@ export function buildGrid(levelConfig) {
   protectedCells.add(`${startPos[0]},${startPos[1]}`);
   for (const [ar, ac] of getAdjacentCells(startPos[0], startPos[1])) {
     protectedCells.add(`${ar},${ac}`);
+  }
+  for (const rune of runeSequence) {
+    if (!rune || !Array.isArray(rune.pos)) continue;
+    const [rr, rc] = rune.pos;
+    if (rr >= 0 && rr < size && rc >= 0 && rc < size) {
+      protectedCells.add(`${rr},${rc}`);
+    }
   }
 
   const maxAttempts = 400;

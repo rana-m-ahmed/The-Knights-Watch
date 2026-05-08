@@ -35,11 +35,12 @@ export function useGameState(levelConfig, onGameStateChange = () => {}) {
   const [cipherFailed, setCipherFailed] = useState(false);
   const [safeRuneSequence, setSafeRuneSequence] = useState([]);
   const [currentLevel, setCurrentLevel] = useState(levelConfig);
+  const [timerResetTick, setTimerResetTick] = useState(0);
 
   const { timeElapsed, timeRemaining, timeRatio, penalizeTime } = useTimer({
     timeLimit: levelConfig?.timeLimit || null,
     active: gameState === 'playing',
-    resetKey: levelConfig?.id,
+    resetKey: `${levelConfig?.id ?? 'none'}:${timerResetTick}`,
     onExpire: () => setGameState('timeout')
   });
 
@@ -85,6 +86,7 @@ export function useGameState(levelConfig, onGameStateChange = () => {}) {
     setCipherFailed(false);
     setSafeRuneSequence(safe);
     setCurrentLevel(config);
+    setTimerResetTick(prev => prev + 1);
     setHistory([{
       grid: cloneGrid(newGrid),
       pos: [sr, sc],

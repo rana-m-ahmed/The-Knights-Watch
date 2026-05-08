@@ -106,7 +106,7 @@ export function Overlay({
             </motion.div>
 
             <div style={{ fontSize: '28px', fontWeight: '700', letterSpacing: '2px', color: '#e8d5a3' }}>
-              Seal Broken!
+              Castle Conquered
             </div>
 
             {/* Cipher cracked badge */}
