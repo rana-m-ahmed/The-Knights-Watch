@@ -124,7 +124,7 @@ export function IntroScreen({ onEnter }) {
         <div style={styles.knight}>♞</div>
       </div>
 
-      <h1 style={styles.title}>Knight's Odyssey</h1>
+      <h1 style={styles.title}>Knight's Watch</h1>
       <div style={styles.subtitle}>The Cursed Tiles</div>
 
       <div style={styles.rule}></div>
