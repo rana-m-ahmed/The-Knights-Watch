@@ -1,16 +1,4 @@
-<div align="center">
-
-✦ &nbsp; ✧ &nbsp; ✦
-
-<pre align="center">
-    ♞
-   /|\
-    | 
-   / \
-</pre>
-
-# ♞ Knight's Watch
-*The Cursed Tiles — A Knight's Tour Puzzle Game*
+<img width="1118" height="597" alt="image" src="https://github.com/user-attachments/assets/fb1fefce-b21d-42fd-b7f3-bf75fb06b99b" />
 
 [![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
 [![Vite](https://img.shields.io/badge/Vite-5-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev)
@@ -19,7 +7,7 @@
 [![License MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
 [![DAA Project](https://img.shields.io/badge/Course-DAA-8A2BE2?style=for-the-badge)](https://bahria.edu.pk)
 
-<a href="https://knights-watch-vercel.app">
+<a href="https://play-knights-watch.vercel.app">
   <img src="https://img.shields.io/badge/▶%20PLAY%20NOW-Enter%20the%20Dungeon-c09a40?style=for-the-badge&logoColor=white" />
 </a>
 
@@ -62,42 +50,38 @@ Knight's Watch is a semester project for Design and Analysis of Algorithms at Ba
 
 ## 🖼️ UI Showcase
 
-<p><sub><i>Screenshots from the live deployment. Replace paths in <code>/docs/screenshots/</code> with actual in-game captures.</i></sub></p>
-
 <div align="center">
 
 <table>
   <tr>
     <td align="center">
-      <img src="docs/screenshots/intro.png" width="380" alt="Intro Screen" /><br/>
+      <img src="https://github.com/user-attachments/assets/364a3011-9fc7-4aa7-b511-d78bfa29ee17" width="380" alt="Intro Screen" /><br/>
       <sub><b>⚔️ Intro Screen</b></sub>
     </td>
     <td align="center">
-      <img src="docs/screenshots/tier1.png" width="380" alt="Tier I Gameplay" /><br/>
+      <img  src="https://github.com/user-attachments/assets/c9916f95-b3e4-430b-81c2-ee5b125be3c2"width="380" alt="Tier I Gameplay" /><br/>
       <sub><b>♞ Tier I — The Courtyard</b></sub>
     </td>
   </tr>
   <tr>
     <td align="center">
-      <img src="docs/screenshots/tier2.png" width="380" alt="Tier II Cursed Tiles" /><br/>
+      <img  src="https://github.com/user-attachments/assets/c46c3621-c93f-4b46-b210-4892203984de" width="380" alt="Tier II Cursed Tiles" /><br/>
       <sub><b>Ψ Tier II — The Keep (Cursed)</b></sub>
     </td>
     <td align="center">
-      <img src="docs/screenshots/tier3.png" width="380" alt="Tier III Fog of War" /><br/>
+      <img src="https://github.com/user-attachments/assets/6cb2eb92-e7fb-4f97-8c04-a805e3550a28" width="380" alt="Tier III Fog of War" /><br/>
       <sub><b>◉ Tier III — The Catacombs (Fog)</b></sub>
     </td>
   </tr>
   <tr>
     <td align="center" colspan="2">
-      <img src="docs/screenshots/tier4.png" width="500" alt="Tier IV Rune Cipher" /><br/>
+      <img  src="https://github.com/user-attachments/assets/1ec48ad8-0d93-463e-99ef-2cc7910b689c" width="500" alt="Tier IV Rune Cipher" /><br/>
       <sub><b>Ω Tier IV — The Abyss (Cipher)</b></sub>
     </td>
   </tr>
 </table>
 
 </div>
-
-<p><sub>💡 <i>To add screenshots: place .png files in <code>/docs/screenshots/</code> and update the src paths above.</i></sub></p>
 
 ---
 
@@ -414,10 +398,6 @@ Every mechanic serves a pedagogical purpose. Tier I teaches the heuristic throug
 **Rana Muhammad Ahmed**
 
 BS Computer Science — Bahria University Islamabad  
-ICPC Team: The Pull Pirates | BU GlobalX Student Ambassador
-
-[![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github)](https://github.com/YOUR_USERNAME)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin)](https://linkedin.com/in/YOUR_PROFILE)
 
 </div>
 
