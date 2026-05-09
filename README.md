@@ -9,7 +9,7 @@
    / \
 </pre>
 
-# ♞ Knight's Odyssey
+# ♞ Knight's Watch
 *The Cursed Tiles — A Knight's Tour Puzzle Game*
 
 [![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
@@ -19,7 +19,7 @@
 [![License MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
 [![DAA Project](https://img.shields.io/badge/Course-DAA-8A2BE2?style=for-the-badge)](https://bahria.edu.pk)
 
-<a href="https://knights-odyssey-vercel.app">
+<a href="https://knights-watch-vercel.app">
   <img src="https://img.shields.io/badge/▶%20PLAY%20NOW-Enter%20the%20Dungeon-c09a40?style=for-the-badge&logoColor=white" />
 </a>
 
@@ -29,11 +29,11 @@
 
 ## 📖 About the Game
 
-Knight's Odyssey is an interactive puzzle game built around the classical Knight's Tour problem—one of the oldest unsolved puzzles in mathematics and computer science. Your mission: maneuver a legendary chess knight across a crumbling stone board, landing on every tile exactly once using the knight's iconic L-shaped move (two squares in one direction, then one square perpendicular). As you traverse, tiles crumble away behind you, forcing perfect planning and flawless execution. This deceptively simple premise masks a profound challenge: the number of possible tours on an 8×8 board exceeds 33 million. Without strategy, you're just guessing. With Warnsdorff's Heuristic, you're unstoppable.
+Knight's Watch is an interactive puzzle game built around the classical Knight's Tour problem—one of the oldest unsolved puzzles in mathematics and computer science. Your mission: maneuver a legendary chess knight across a crumbling stone board, landing on every tile exactly once using the knight's iconic L-shaped move (two squares in one direction, then one square perpendicular). As you traverse, tiles crumble away behind you, forcing perfect planning and flawless execution. This deceptively simple premise masks a profound challenge: the number of possible tours on an 8×8 board exceeds 33 million. Without strategy, you're just guessing. With Warnsdorff's Heuristic, you're unstoppable.
 
 The game transforms the Knight's Tour from abstract theory into visceral gameplay. Each tier escalates the challenge with dark-fantasy mechanics: cursed tiles that drain your time, fog-of-war that shrouds the board, and a hidden rune cipher that rewards algorithmic thinking. The crumbling stone aesthetic, the haunting UI elements, and the dynamic timer all drive home the pressure. Yet beneath the gothic veneer lies elegant algorithmic design—Warnsdorff's Heuristic is not just a backend optimization, it is the core of how you win.
 
-Knight's Odyssey is a semester project for Design and Analysis of Algorithms at Bahria University Islamabad, demonstrating that computer science theory becomes most powerful when made tangible, interactive, and beautiful. This is not a game *about* algorithms—it is a game *powered by* them, where understanding the heuristic transforms your play.
+Knight's Watch is a semester project for Design and Analysis of Algorithms at Bahria University Islamabad, demonstrating that computer science theory becomes most powerful when made tangible, interactive, and beautiful. This is not a game *about* algorithms—it is a game *powered by* them, where understanding the heuristic transforms your play.
 
 ---
 
@@ -210,19 +210,19 @@ All 16 levels across four tiers and three landmark zones:
 
 ## 🧠 The Algorithm Behind the Game
 
-Knight's Odyssey is powered by deep algorithmic thinking. Every mechanic teaches a lesson from Design and Analysis of Algorithms.
+Knight's Watch is powered by deep algorithmic thinking. Every mechanic teaches a lesson from Design and Analysis of Algorithms.
 
 ### The Knight's Tour Problem
 
 The Knight's Tour is a chess puzzle dating to ancient times, formalized in the 18th century: given an n×n board, find a sequence of knight moves that visits every square exactly once. For small boards (n ≤ 6), brute-force solutions exist. For larger boards, the problem becomes NP-hard in its general form (finding *all* tours is exponential). Yet remarkably, for a standard 8×8 chessboard, a solution almost always exists—the challenge is finding it efficiently.
 
-This is the heart of the Knight's Odyssey: transforming an ancient mathematical curiosity into an interactive puzzle where strategy and intuition guide you to victory.
+This is the heart of the Knight's Watch: transforming an ancient mathematical curiosity into an interactive puzzle where strategy and intuition guide you to victory.
 
 ### Warnsdorff's Heuristic
 
 In 1823, H. C. von Warnsdorff discovered a greedy heuristic that revolutionized Knight's Tour solving: **always move to the square with the fewest onward moves**. This deceptively simple rule achieves near-miraculous results—it solves the Knight's Tour in O(n²) time on average, with a success rate exceeding 99% on standard boards, eliminating the need for backtracking entirely.
 
-In Knight's Odyssey, Warnsdorff's Heuristic is made tangible. In **Tier I**, the hint numbers on each tile *are* the Warnsdorff scores. Players who learn to follow the hints master the optimal greedy strategy without even realizing it. In **Tier IV**, the Rune Cipher rewards only those who visit runes in Warnsdorff-optimal order—a +15-second time bonus is the game's way of saying: "You understood the algorithm."
+In Knight's Watch, Warnsdorff's Heuristic is made tangible. In **Tier I**, the hint numbers on each tile *are* the Warnsdorff scores. Players who learn to follow the hints master the optimal greedy strategy without even realizing it. In **Tier IV**, the Rune Cipher rewards only those who visit runes in Warnsdorff-optimal order—a +15-second time bonus is the game's way of saying: "You understood the algorithm."
 
 The beauty of Warnsdorff's Heuristic lies in its accessibility: no complex computation, just counting your options and choosing conservatively. Yet when applied at scale across a full board, it generates optimal (or near-optimal) paths that would take exhaustive search forever to discover.
 
@@ -230,7 +230,7 @@ The beauty of Warnsdorff's Heuristic lies in its accessibility: no complex compu
 
 While Warnsdorff solves most tours greedily, the classical alternative is **depth-first search (DFS) with backtracking**: explore moves recursively, and if you hit a dead end, backtrack and try the next branch. This exhaustive search is guaranteed to find a solution if one exists, but it incurs exponential time complexity in the worst case: O(8^n²) for an n×n board.
 
-Backtracking is *not* used during gameplay (too slow), but it powers Knight's Odyssey's **level generator and solvability validator**. Before any level is presented to the player, the engine confirms that a valid tour exists using backtracking. This ensures no impossible puzzles slip through.
+Backtracking is *not* used during gameplay (too slow), but it powers Knight's Watch's **level generator and solvability validator**. Before any level is presented to the player, the engine confirms that a valid tour exists using backtracking. This ensures no impossible puzzles slip through.
 
 | Property | Warnsdorff | Backtracking |
 |---|---|---|
@@ -242,7 +242,7 @@ Backtracking is *not* used during gameplay (too slow), but it powers Knight's Od
 
 ### Level Generation & Seeded Determinism
 
-Every level in Knight's Odyssey is generated procedurally using a **seeded PRNG (mulberry32 algorithm)**. The seed determines:
+Every level in Knight's Watch is generated procedurally using a **seeded PRNG (mulberry32 algorithm)**. The seed determines:
 
 1. **Chasm placement** — Random stones scatter across the board, creating permanent obstacles.
 2. **Warnsdorff validation** — The board is tested for solvability using backtracking.
@@ -267,7 +267,7 @@ This design ensures that each level is *deterministic*—the same seed always pr
 
 **Architecture Overview:**
 
-Knight's Odyssey is built with modern React 18 and Vite for blazing-fast development and production bundles. The engine is pure JavaScript with no external dependencies for game logic—knightLogic.js, levelGenerator.js, solver.js, and scoring.js are self-contained modules. UI state flows through custom hooks (useGameState.js for orchestration, useTimer.js for countdown logic), enabling clean component separation.
+Knight's Watch is built with modern React 18 and Vite for blazing-fast development and production bundles. The engine is pure JavaScript with no external dependencies for game logic—knightLogic.js, levelGenerator.js, solver.js, and scoring.js are self-contained modules. UI state flows through custom hooks (useGameState.js for orchestration, useTimer.js for countdown logic), enabling clean component separation.
 
 Styling relies entirely on **CSS-in-JS via inline style objects**—no CSS-in-JS framework, no external CSS preprocessor. This keeps the bundle minimal and the theming system (CSS variables for tier-specific palettes) flexible. Framer Motion powers all screen transitions, tile animations, and atmospheric effects, providing 60fps performance even on mobile devices.
 
@@ -278,7 +278,7 @@ Persistence is handled by browser localStorage, ensuring stars and progress surv
 ## 📁 Project Structure
 
 ```
-knights-odyssey/
+knights-watch/
 ├── public/
 │   └── [Static assets]
 ├── src/
@@ -333,8 +333,8 @@ knights-odyssey/
 **1. Clone the repository:**
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/knights-odyssey.git
-cd knights-odyssey
+git clone https://github.com/YOUR_USERNAME/knights-watch.git
+cd knights-watch
 ```
 
 **2. Install dependencies:**
@@ -399,11 +399,11 @@ Earn up to three stars per level, plus a special cipher bonus on Tier IV:
 
 ## 🎓 Academic Context
 
-Knight's Odyssey is a semester capstone project for the **Design and Analysis of Algorithms** course at **Bahria University Islamabad**, School of Engineering and Applied Sciences. It bridges classical algorithmic theory with interactive game design, demonstrating that computer science concepts are most powerful when made tangible, playable, and beautiful.
+Knight's Watch is a semester capstone project for the **Design and Analysis of Algorithms** course at **Bahria University Islamabad**, School of Engineering and Applied Sciences. It bridges classical algorithmic theory with interactive game design, demonstrating that computer science concepts are most powerful when made tangible, playable, and beautiful.
 
-The project explores fundamental principles of graph traversal, greedy heuristics, and combinatorial optimization. The Knight's Tour problem is NP-hard in its general form—no polynomial-time algorithm is known for *all* configurations—yet Warnsdorff's Heuristic solves it greedily and nearly perfectly. Knight's Odyssey externalizes this tradeoff: players experience the tension between optimal greedy choices and the looming possibility of dead ends. Those who understand why Warnsdorff's strategy works play better. Players who play better internalize the algorithm. The game becomes a medium for understanding.
+The project explores fundamental principles of graph traversal, greedy heuristics, and combinatorial optimization. The Knight's Tour problem is NP-hard in its general form—no polynomial-time algorithm is known for *all* configurations—yet Warnsdorff's Heuristic solves it greedily and nearly perfectly. Knight's Watch externalizes this tradeoff: players experience the tension between optimal greedy choices and the looming possibility of dead ends. Those who understand why Warnsdorff's strategy works play better. Players who play better internalize the algorithm. The game becomes a medium for understanding.
 
-Every mechanic serves a pedagogical purpose. Tier I teaches the heuristic through explicit hints. Tier II introduces time pressure—the real-world cost of poor algorithm choices. Tier III adds imperfect information (fog of war), forcing mental modeling and lookahead. Tier IV rewards those who reverse-engineer the optimal strategy hidden beneath gameplay. In essence, Knight's Odyssey *is* the algorithm made interactive.
+Every mechanic serves a pedagogical purpose. Tier I teaches the heuristic through explicit hints. Tier II introduces time pressure—the real-world cost of poor algorithm choices. Tier III adds imperfect information (fog of war), forcing mental modeling and lookahead. Tier IV rewards those who reverse-engineer the optimal strategy hidden beneath gameplay. In essence, Knight's Watch *is* the algorithm made interactive.
 
 ---
 
