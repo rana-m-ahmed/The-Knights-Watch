@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { IntroScreen } from './components/IntroScreen.jsx';
 import { LevelSelect } from './components/LevelSelect.jsx';
 import { Board } from './components/Board.jsx';
@@ -88,11 +89,21 @@ function App() {
     : '';
 
   if (screen === 'intro') {
-    return <IntroScreen onEnter={() => setScreen('select')} />;
+    return (
+      <>
+        <IntroScreen onEnter={() => setScreen('select')} />
+        <Analytics />
+      </>
+    );
   }
 
   if (screen === 'select') {
-    return <LevelSelect levelStars={levelStars} onSelectLevel={handleSelectLevel} onBackToTitle={handleBackToTitle} />;
+    return (
+      <>
+        <LevelSelect levelStars={levelStars} onSelectLevel={handleSelectLevel} onBackToTitle={handleBackToTitle} />
+        <Analytics />
+      </>
+    );
   }
 
   if (screen === 'game' && game && game.grid && game.grid.length > 0) {
@@ -229,6 +240,7 @@ function App() {
             </button>
           </div>
         </div>
+        <Analytics />
       </div>
     );
   }
